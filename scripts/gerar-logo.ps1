@@ -1,5 +1,6 @@
 # Draws the home's art: banner (640x360, night sky like SkyView, glass dock, serif name) and a transparent 288px icon.
-#   powershell -ExecutionPolicy Bypass -File gerar-logo.ps1 -Res launcherppsrcmaines -Font launcherppsrcmainesontinstrument_serif.ttf
+#   powershell -ExecutionPolicy Bypass -File scripts/gerar-logo.ps1 -Res launcher/app/src/main/res -Font launcher/app/src/main/res/font/instrument_serif.ttf
+# (Windows PowerShell 5 reads this file as ANSI: keep it ASCII; accents go in as [char] codes.)
 param([string]$Res, [string]$Font)
 Add-Type -AssemblyName System.Drawing
 $fonts = New-Object System.Drawing.Text.PrivateFontCollection
