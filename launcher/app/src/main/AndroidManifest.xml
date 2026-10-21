@@ -55,6 +55,23 @@
             </intent-filter>
         </activity>
 
+        <!-- Fire OS, for testing: opens Amazon's original home and pauses the Home bounce (AmazonHomeActivity). -->
+        <activity
+            android:name=".AmazonHomeActivity"
+            android:exported="true"
+            android:label="@string/amazon_home"
+            android:icon="@drawable/ic_firehome"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".HomeSettingsActivity"
             android:exported="false"

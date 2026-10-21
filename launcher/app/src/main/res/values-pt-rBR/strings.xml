@@ -9,6 +9,7 @@
     <string name="standby">Em espera</string>
     <string name="not_connected">Sem aparelho</string>
     <string name="live_tv">TV Aberta</string>
+    <string name="amazon_home">Fire OS</string>
     <string name="no_inputs">Nenhuma entrada encontrada</string>
     <string name="good_morning">Bom dia</string>
     <string name="good_afternoon">Boa tarde</string>

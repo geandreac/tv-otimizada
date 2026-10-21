@@ -43,6 +43,14 @@ public class HomeKeyService extends AccessibilityService {
     private String front = "";          // package of the window in front
     private boolean settingsMode;       // the user is in Amazon's Settings tab on purpose
 
+    // Set by the "Home Fire OS" shortcut (AmazonHomeActivity): Amazon's home stays until this home is opened again.
+    private static volatile boolean amazonMode;
+
+    /** Testing: show Amazon's own home and stop bouncing off it until the user comes back to this home. */
+    static void amazonRequested() {
+        amazonMode = true;
+    }
+
     /** Our Settings pill was pressed: on Fire OS that opens the Settings tab of Amazon's home. */
     static void settingsRequested() {
         settingsAskedAt = SystemClock.uptimeMillis();
@@ -82,8 +90,13 @@ public class HomeKeyService extends AccessibilityService {
         String pkg = e.getPackageName().toString();
         if (pkg.equals("android") || pkg.equals("com.android.systemui")) return;   // popups don't count
         front = pkg;
+        CharSequence cls = e.getClassName();
         if (pkg.equals(getPackageName())) {
-            settingsMode = false;
+            // Only the home itself ends a visit: the invisible Fire OS shortcut belongs to this package too.
+            if (cls != null && cls.toString().endsWith(".MainActivity")) {
+                settingsMode = false;
+                amazonMode = false;
+            }
             return;
         }
         // Something else opened first (Amazon's settings sub-screens included): drop a queued bounce.
@@ -91,8 +104,7 @@ public class HomeKeyService extends AccessibilityService {
             getSystemService(AlarmManager.class).cancel(bounceIntent(this));
             return;
         }
-        CharSequence cls = e.getClassName();
-        if (cls == null || !cls.toString().contains("HomeActivity") || settingsMode) return;
+        if (cls == null || !cls.toString().contains("HomeActivity") || settingsMode || amazonMode) return;
         if (SystemClock.uptimeMillis() - settingsAskedAt < 3000) {
             // Opened from our Settings pill: stay until the Settings tab is left (Back or Home inside it).
             settingsMode = true;

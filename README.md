@@ -45,6 +45,7 @@ Os avisos de copyright originais estão em [`launcher/LICENSE-cleanyourtv`](laun
 - **App Dormir** (`launcher/dormir/`): tela escura com relógio flutuante que mantém a TV acordada enquanto o Spotify toca. O brilho se ajusta no controle (Cima/Baixo) para achar o nível mais escuro que a TV aceita sem achar que está "sem sinal".
 - **Bloco TV Aberta**: o app de TV da TCL vira o primeiro bloco e abre sempre na antena, mesmo vindo de um HDMI.
 - **Botão Home sem desligar a home original**: na TCL o serviço de acessibilidade captura a tecla Home. No Fire OS ele observa a home da Amazon e volta por um alarme do sistema. Tem ainda um modo Configurações que não briga com a aba de configurações da Amazon.
+- **Atalho "Fire OS"** (só no Fire TV, para testes): abre a home original da Amazon e pausa o bate-volta até você abrir a home nova de novo.
 - **Céu parado no Fire TV**: no Stick de 1 GB, o céu é desenhado uma vez e só redesenha na troca de cor.
 - **Logo nova** da home (banner e ícone) e **tradução pt-BR** completa da interface.
 - **Correções**: ícone de bloco centralizado e sem corte, e dock que serve aos dois aparelhos.

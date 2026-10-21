@@ -133,6 +133,15 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
      * Rebuilds the tiles. A shown module card stands in for every tile of its package (same component,
      * so focus follows it); hidden_apps wins over a card, and a card's package in dock_apps takes that slot.
      */
+    private static boolean amazonHomePresent(PackageManager pm) {
+        try {
+            pm.getPackageInfo(AmazonHomeActivity.AMAZON_HOME, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
     void reload(List<Cards.Card> cards) {
         PackageManager pm = ctx.getPackageManager();
         Intent probe = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER);
@@ -143,12 +152,16 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
         for (ResolveInfo ri : found) {
             if (ri.activityInfo == null) continue;
             String pkg = ri.activityInfo.packageName;
-            if (pkg.equals(ctx.getPackageName()) || hidden.contains(pkg)) continue;
+            boolean own = pkg.equals(ctx.getPackageName());
+            // Of our own entries only the "Home Fire OS" shortcut gets a tile, and only where Amazon's home exists.
+            if (own && !(ri.activityInfo.name.endsWith(".AmazonHomeActivity") && amazonHomePresent(pm))) continue;
+            if (hidden.contains(pkg)) continue;
             ComponentName component = new ComponentName(pkg, ri.activityInfo.name);
             Cards.Card card = cardByPkg.get(pkg);
             if (card != null && !card.component.equals(component)) continue;   // the card stands in for this tile
-            Drawable banner = ri.activityInfo.loadBanner(pm);
-            if (banner == null) banner = ri.activityInfo.applicationInfo.loadBanner(pm);
+            // Ours: icon + name, never the app's "Início" banner (loadBanner falls back to it on its own).
+            Drawable banner = own ? null : ri.activityInfo.loadBanner(pm);
+            if (banner == null && !own) banner = ri.activityInfo.applicationInfo.loadBanner(pm);
             Drawable icon = ri.loadIcon(pm);
             if (card != null) {
                 fresh.add(new Entry(Entry.CARD, card.label, component, banner, icon, card.caption, card.accent));
