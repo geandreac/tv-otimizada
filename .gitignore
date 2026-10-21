@@ -1,0 +1,13 @@
+# Build
+build/
+.gradle/
+local.properties
+*.apk
+*.jks
+.idea/
+*.iml
+
+# Gerados por TV (contêm o histórico de mudanças da sua casa)
+alteracoes-log.txt
+desfazer-tudo.sh
+*.tmp

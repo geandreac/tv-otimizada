@@ -1,0 +1,30 @@
+plugins {
+    id 'com.android.application'
+}
+
+// "Dormir": a black screen that keeps the TV awake while music plays in the background. No libraries.
+android {
+    namespace 'com.gathin.dormir'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.gathin.dormir'
+        minSdk 22
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+            // Sideloaded over ADB, never published.
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+}

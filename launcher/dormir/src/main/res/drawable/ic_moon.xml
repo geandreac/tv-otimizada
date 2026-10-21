@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Crescent moon, white on transparent: the home draws it on its glass tile with the name under it. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp" android:height="48dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M12.1,3C7.1,3 3,7.1 3,12.1s4.1,9 9.1,9c3.9,0 7.3,-2.5 8.5,-6.1c-0.9,0.4 -1.9,0.6 -2.9,0.6c-4.2,0 -7.6,-3.4 -7.6,-7.6c0,-1.9 0.7,-3.6 1.9,-5C12,3 12,3 12.1,3z" />
+</vector>

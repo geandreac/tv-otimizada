@@ -1,0 +1,259 @@
+<title>Otimização Fire TV e TCL</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: relatório técnico de uma coluna; cada aparelho é uma seção com resumo, medidor de RAM, tabela e capturas. */
+:root {
+  --bg: #f3f5f8; --surface: #ffffff; --ink: #141a24; --muted: #5b6676; --line: #d9dee6;
+  --accent: #2459d6; --accent-soft: #e3ebfb; --good: #127a4a; --good-soft: #dff3e8;
+  --warn: #9a5b00; --warn-soft: #fbefd9; --bad: #b42318; --bad-soft: #fbe2df;
+  --bar-old: #a9b3c2; --bar-new: #2459d6;
+  --display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --body: "Barlow", "Segoe UI", Roboto, Arial, sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e131b; --surface: #161d28; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3443;
+  --accent: #7ea6ff; --accent-soft: #1d2a45; --good: #5fd39a; --good-soft: #143326;
+  --warn: #f2b45c; --warn-soft: #3a2a12; --bad: #ff8a7a; --bad-soft: #3d1a17;
+  --bar-old: #4a5566; --bar-new: #7ea6ff; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0e131b; --surface: #161d28; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3443;
+  --accent: #7ea6ff; --accent-soft: #1d2a45; --good: #5fd39a; --good-soft: #143326;
+  --warn: #f2b45c; --warn-soft: #3a2a12; --bad: #ff8a7a; --bad-soft: #3d1a17;
+  --bar-old: #4a5566; --bar-new: #7ea6ff; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.55 var(--body); }
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 40px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.1; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; }
+h2 { font-size: 1.9rem; font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font: 600 .78rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.lede { color: var(--muted); font-size: 1.05rem; }
+header { display: grid; gap: 12px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); font: 400 .85rem/1.4 var(--mono); }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; gap: 4px; }
+.tile .k { color: var(--muted); font-size: .85rem; }
+.tile .v { font: 700 2rem/1.1 var(--display); font-variant-numeric: tabular-nums; }
+.tile .d { font: 600 .85rem/1.3 var(--mono); color: var(--good); }
+
+section.device { display: grid; gap: 20px; }
+.devhead { display: grid; gap: 6px; border-top: 3px solid var(--ink); padding-top: 14px; }
+.spec { font: 400 .85rem/1.5 var(--mono); color: var(--muted); }
+
+.meter { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 14px; }
+.meter .row { display: grid; grid-template-columns: 150px 1fr 76px; align-items: center; gap: 12px; }
+.meter .lab { font-size: .9rem; }
+.meter .lab small { display: block; color: var(--muted); font: 400 .72rem/1.3 var(--mono); }
+.track { position: relative; height: 22px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.fill { position: absolute; inset: 0 auto 0 0; background: var(--bar-old); border-radius: 4px; }
+.fill.new { background: var(--bar-new); }
+.val { font: 600 .9rem/1 var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.axis { display: grid; grid-template-columns: 150px 1fr 76px; gap: 12px; }
+.ticks { display: flex; justify-content: space-between; font: 400 .7rem/1 var(--mono); color: var(--muted); }
+
+.tablebox { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: .92rem; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { font: 600 .74rem/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+tbody tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td:first-child { font-weight: 600; }
+.pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font: 600 .74rem/1.4 var(--mono); }
+.pill.good { background: var(--good-soft); color: var(--good); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.panel ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.freed { display: grid; gap: 6px; font-size: .9rem; }
+.freed div { display: grid; grid-template-columns: 1fr auto; gap: 12px; border-bottom: 1px dashed var(--line); padding-bottom: 4px; }
+.freed code, td code, li code { font: 400 .8rem var(--mono); color: var(--muted); }
+.freed .total { border-bottom: 0; font-weight: 600; }
+
+figure { margin: 0; display: grid; gap: 8px; min-width: 0; }
+figure img { width: 100%; max-width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); display: block; }
+figcaption { font-size: .85rem; color: var(--muted); }
+figcaption b { color: var(--ink); font-weight: 600; }
+
+.note { border-left: 3px solid var(--warn); background: var(--warn-soft); padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: .9rem; display: grid; gap: 6px; }
+footer { color: var(--muted); font-size: .85rem; display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 16px; }
+
+@media (max-width: 560px) {
+  .meter .row, .axis { grid-template-columns: 96px 1fr 64px; gap: 8px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Relatório de otimização · 19 e 20 de outubro de 2026</span>
+    <h1>Original × Otimizado: Fire TV Stick Lite e TCL 98C6K</h1>
+    <p class="lede">Os mesmos passos nos dois aparelhos, sem root e com tudo reversível: backup, desligar apps de propaganda e telemetria com <code>pm disable-user</code>, zerar animações, desligar o protetor de tela e trocar a home por uma tela própria no estilo glass. Os números saem do próprio Android, lidos pelo adb antes e depois.</p>
+    <div class="meta"><span>Fonte: /proc/meminfo (MemAvailable) e dumpsys meminfo</span><span>Aparelhos parados na tela inicial</span><span>1 MB = 1024 KB</span></div>
+  </header>
+
+  <div class="tiles" aria-label="Resumo">
+    <div class="tile"><span class="k">TCL · memória disponível</span><span class="v">924 → 1.082 MB</span><span class="d">+158 MB (+17%)</span></div>
+    <div class="tile"><span class="k">TCL · RAM dos apps desligados</span><span class="v">127 MB</span><span class="d">34 pacotes desligados</span></div>
+    <div class="tile"><span class="k">Fire TV · estado da memória</span><span class="v">crítico → normal</span><span class="d">classificação do próprio Android</span></div>
+    <div class="tile"><span class="k">Fire TV · RAM em uso</span><span class="v">822 → 614 MB</span><span class="d">−208 MB (−25%)</span></div>
+  </div>
+
+  <!-- ================= TCL ================= -->
+  <section class="device" aria-labelledby="tcl">
+    <div class="devhead">
+      <span class="eyebrow">Aparelho 1</span>
+      <h2 id="tcl">TCL 98C6K · Google TV 14</h2>
+      <p class="spec">Placa G08 · MediaTek MT5896 · 2,4 GB de RAM (2.394 MB) · firmware UTT2.250416.001 AU02</p>
+    </div>
+
+    <div class="meter" role="img" aria-label="Memória disponível na TCL: 924 MB no original, 1.082 MB otimizado, numa escala de 0 a 1.200 MB">
+      <h3>Memória disponível para apps</h3>
+      <div class="row"><span class="lab">Original<small>5,5 min após o boot</small></span><div class="track"><div class="fill" style="width:77.0%"></div></div><span class="val">924 MB</span></div>
+      <div class="row"><span class="lab">Otimizado<small>9,2 min após o boot</small></span><div class="track"><div class="fill new" style="width:90.1%"></div></div><span class="val">1.082 MB</span></div>
+      <div class="axis"><span></span><div class="ticks"><span>0</span><span>300</span><span>600</span><span>900</span><span>1.200 MB</span></div><span></span></div>
+    </div>
+
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Item</th><th>Original</th><th>Otimizado</th><th>Diferença</th></tr></thead>
+        <tbody>
+          <tr><td>Memória disponível</td><td class="num">923,6 MB</td><td class="num">1.081,5 MB</td><td class="num">+157,9 MB (+17,1%)</td></tr>
+          <tr><td>RAM em uso</td><td class="num">1.643,9 MB</td><td class="num">1.615,4 MB</td><td class="num">−28,5 MB</td></tr>
+          <tr><td>Processos na memória</td><td class="num">168</td><td class="num">160</td><td class="num">−8</td></tr>
+          <tr><td>RAM perdida (Lost RAM)</td><td class="num">26,3 MB</td><td class="num">6,8 MB</td><td class="num">−19,5 MB</td></tr>
+          <tr><td>Estado da memória (Android)</td><td><span class="pill good">normal</span></td><td><span class="pill good">normal</span></td><td>sem mudança</td></tr>
+          <tr><td>Pacotes desligados</td><td class="num">0</td><td class="num">34</td><td>nenhum desinstalado</td></tr>
+          <tr><td>Rastreamento do que você assiste</td><td><span class="pill bad">ativo</span> Samba TV (<code>tcl.ttvs</code>)</td><td><span class="pill good">desligado</span></td><td>também logs e feedback</td></tr>
+          <tr><td>Conteúdo patrocinado da TCL</td><td><span class="pill bad">ativo</span> TCL Live, mensagens, instalador silencioso</td><td><span class="pill good">desligado</span></td><td>8 pacotes</td></tr>
+          <tr><td>Animações do sistema</td><td class="num">1,0×</td><td class="num">0 (desligadas)</td><td>menus respondem na hora</td></tr>
+          <tr><td>Protetor de tela</td><td>Modo ambiente (com promoções)</td><td>Desligado</td><td>valores antigos guardados</td></tr>
+          <tr><td>Tela inicial</td><td>Google TV, com recomendações</td><td>Home glass em português, TV Aberta em 1º</td><td>Google TV fica carregada por baixo (91 MB)</td></tr>
+          <tr><td>TV Aberta</td><td>Abre na última entrada usada</td><td>Sempre na antena, mesmo vindo do HDMI</td><td>testado: HDMI 1 → antena</td></tr>
+          <tr><td>Voz no controle</td><td>Google Assistente</td><td>Google Assistente</td><td>mantido, a pedido</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two">
+      <div class="panel">
+        <h3>RAM que os apps desligados ocupavam</h3>
+        <p class="spec">Medido no backup original, por processo.</p>
+        <div class="freed">
+          <div><span>Modo ambiente <code>dreamx</code></span><span class="num">38,4 MB</span></div>
+          <div><span>Samba TV / análise TCL <code>ttvs</code></span><span class="num">32,5 MB</span></div>
+          <div><span>Sincronização de agenda</span><span class="num">24,3 MB</span></div>
+          <div><span>Conta TCL <code>usercenter</code></span><span class="num">9,5 MB</span></div>
+          <div><span>AirPlay (TCL + MediaTek)</span><span class="num">12,4 MB</span></div>
+          <div><span>Parceiros Google <code>partnersetup</code></span><span class="num">4,9 MB</span></div>
+          <div><span>Espelhamento Miracast</span><span class="num">4,8 MB</span></div>
+          <div class="total"><span>Total</span><span class="num">126,7 MB</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Limites desta TV</h3>
+        <ul>
+          <li>Desligar o assistente de configuração do Google TV derrubou o Wi-Fi. Por isso a home do Google continua ligada, e o botão Home é redirecionado por um serviço de acessibilidade.</li>
+          <li>Desligar e ligar pelo controle mantém a home nova (testado). Num reinício completo, o firmware bloqueia o serviço, e é preciso rodar <code>scripts/reativar-home.sh</code> no PC.</li>
+          <li>As duas medições foram feitas em momentos diferentes após o boot (5,5 e 9,2 min), então parte da diferença pode vir do sistema ainda se acomodando.</li>
+        </ul>
+      </div>
+    </div>
+
+    <figure>
+      <img src="img/tcl-otimizada.jpg" alt="Home nova da TCL: céu azul, relógio em serifa, botões de vidro e dock com TV Aberta, YouTube, Netflix, Prime Video, Disney+, HBO Max e Paramount+">
+      <figcaption><b>Otimizado.</b> Home glass com o céu vivo; a cor do app em foco (YouTube) sobe pelo céu. Não há captura da home original do Google TV.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================= FIRE TV ================= -->
+  <section class="device" aria-labelledby="fire">
+    <div class="devhead">
+      <span class="eyebrow">Aparelho 2</span>
+      <h2 id="fire">Fire TV Stick Lite · Fire OS 7.7.1.7</h2>
+      <p class="spec">Modelo AFTSS (sheldon) · Android 9 · 1 GB de RAM (900 MB úteis) · build PS7717/5741</p>
+    </div>
+
+    <div class="meter" role="img" aria-label="Memória disponível no Fire TV por etapa, escala de 0 a 300 MB: original 248, limpeza 1 252, limpeza 2 280, home nova 265">
+      <h3>Memória disponível para apps, por etapa</h3>
+      <div class="row"><span class="lab">Original<small>antes de qualquer mudança</small></span><div class="track"><div class="fill" style="width:82.8%"></div></div><span class="val">248 MB</span></div>
+      <div class="row"><span class="lab">Limpeza 1<small>27 pacotes, 9 min após boot</small></span><div class="track"><div class="fill new" style="width:84.1%"></div></div><span class="val">252 MB</span></div>
+      <div class="row"><span class="lab">Limpeza 2<small>+15 (Alexa), 9 min após boot</small></span><div class="track"><div class="fill new" style="width:93.4%"></div></div><span class="val">280 MB</span></div>
+      <div class="row"><span class="lab">Home nova<small>com YouTube em cache</small></span><div class="track"><div class="fill new" style="width:88.4%"></div></div><span class="val">265 MB</span></div>
+      <div class="axis"><span></span><div class="ticks"><span>0</span><span>100</span><span>200</span><span>300 MB</span></div><span></span></div>
+    </div>
+
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Item</th><th>Original</th><th>Otimizado</th><th>Diferença</th></tr></thead>
+        <tbody>
+          <tr><td>Estado da memória (Android)</td><td><span class="pill bad">crítico</span></td><td><span class="pill good">normal</span></td><td>saiu da faixa crítica</td></tr>
+          <tr><td>Memória disponível</td><td class="num">248,4 MB</td><td class="num">265,3 MB</td><td class="num">+16,9 MB (+6,8%)</td></tr>
+          <tr><td>RAM em uso</td><td class="num">822,3 MB</td><td class="num">614,4 MB</td><td class="num">−207,9 MB (−25%)</td></tr>
+          <tr><td>RAM livre + cache</td><td class="num">144,0 MB</td><td class="num">358,6 MB</td><td class="num">+214,6 MB</td></tr>
+          <tr><td>Pacotes desligados</td><td class="num">1 (NFC, de fábrica)</td><td class="num">42</td><td>2 recusados pelo Fire OS (protegidos)</td></tr>
+          <tr><td>Telemetria e reconhecimento de conteúdo</td><td><span class="pill bad">ativo</span></td><td><span class="pill good">desligado</span></td><td>métricas, logs, <code>tv.acr</code>, <code>minerva</code></td></tr>
+          <tr><td>Anúncios e compras</td><td><span class="pill bad">ativo</span></td><td><span class="pill good">desligado</span></td><td>ID de anúncio, ShopTV, vídeo automático</td></tr>
+          <tr><td>DNS de anúncios</td><td>Padrão da operadora</td><td>AdGuard DNS</td><td><code>amazon-adsystem</code>, <code>device-metrics</code>, <code>doubleclick</code> bloqueados</td></tr>
+          <tr><td>Animações do sistema</td><td class="num">1,0×</td><td class="num">0 (desligadas)</td><td>menus respondem na hora</td></tr>
+          <tr><td>Protetor de tela</td><td>Ligado</td><td>Desligado</td><td>valores antigos guardados</td></tr>
+          <tr><td>Tela inicial</td><td>Amazon, com banner patrocinado</td><td>Home glass, céu parado</td><td>home da Amazon segue carregada (69 MB)</td></tr>
+          <tr><td>CPU da home parada</td><td class="num">—</td><td class="num">0%</td><td>céu animado usava 10% de um núcleo</td></tr>
+          <tr><td>Voz no controle</td><td>Alexa</td><td>Desligada</td><td>escolha sua; religável com um comando</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two">
+      <div class="panel">
+        <h3>Onde a memória mudou</h3>
+        <p class="spec">Processos do Fire OS, original → final (PSS).</p>
+        <div class="freed">
+          <div><span>Appstore <code>venezia</code></span><span class="num">73,0 → 22,8 MB</span></div>
+          <div><span>Serviços do aparelho <code>device.services</code></span><span class="num">60,3 → 26,4 MB</span></div>
+          <div><span>Visual da Alexa <code>vizzini</code></span><span class="num">42,1 → 25,3 MB</span></div>
+          <div><span>Player da Alexa</span><span class="num">11,2 → 0 MB</span></div>
+          <div><span>Home da Amazon</span><span class="num">69,5 → 68,5 MB</span></div>
+          <div><span>Home nova (glass)</span><span class="num">0 → 51,6 MB</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Limites deste aparelho</h3>
+        <ul>
+          <li>O Fire OS não deixa trocar a home. Ao apertar Home, a da Amazon aparece por 1 a 2 segundos e a nova volta por cima.</li>
+          <li>O banner do topo da home da Amazon vem do mesmo servidor do conteúdo, então o DNS não o remove. Anúncios dentro dos streamings também continuam.</li>
+          <li>Atualizações da Appstore podem religar apps (aconteceu com o Pluto TV). <code>desligar-apps.sh</code> desliga de novo.</li>
+          <li>O original foi medido com a Appstore aberta e a final com o YouTube em cache, então a RAM em uso compara momentos diferentes. O estado da memória e a memória disponível são as medidas mais justas.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="two">
+      <figure>
+        <img src="img/fire-original.jpg" alt="Home original da Amazon com banner patrocinado da Disney+ no topo e fileiras de recomendações">
+        <figcaption><b>Original.</b> Home da Amazon, com banner patrocinado no topo.</figcaption>
+      </figure>
+      <figure>
+        <img src="img/fire-otimizada.jpg" alt="Home nova no Fire TV: céu azul parado, relógio em serifa, botões de vidro Wi-Fi e Configurações e dock com os apps">
+        <figcaption><b>Otimizado.</b> Home glass com céu parado, sem anúncios, só os seus apps.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="note">
+    <strong>Como desfazer</strong>
+    <p>Cada mudança está em um log com o comando que a desfaz. Fire TV: <code>desfazer-tudo.sh</code> (53 entradas). TCL: <code>desfazer-tudo.sh</code> próprio (46 entradas). Os dois religam apps, restauram configurações e removem a home nova.</p>
+  </div>
+
+  <footer>
+    <span>Leituras feitas pelo adb sobre Wi-Fi. Backups completos (apps, configurações global, system e secure, memória) ficaram só no computador do dono (não vão para o repositório).</span>
+    <span>Base: tv-detox (Ansub Khan), cleanyourtv (Gathin23) e o visual do fireglass, os três com licença MIT.</span>
+  </footer>
+</div>

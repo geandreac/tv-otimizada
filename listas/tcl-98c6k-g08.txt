@@ -1,0 +1,38 @@
+# TCL 98C6K, placa G08 (MediaTek MT5896), Google TV 14, firmware AU02
+# Desligados com pm disable-user (nada desinstalado). Comente o que você usa.
+# NUNCA desligue com.google.android.tungsten.setupwraith nesta TV: o Wi-Fi caiu na hora.
+# Mantidos de propósito: Google Assistente, Alexa TCL, TV/antena/HDMI, controle, Bluetooth, teclado, Play, WebView, atualização.
+com.tcl.ttvs
+com.tcl.logkit
+com.tcl.usercenter
+com.google.android.feedback
+com.android.tv.feedbackconsent
+com.tcl.channelplus
+com.tcl.tv.tclhome_passive
+com.tcl.partnercustomizer
+com.tcl.interactive
+com.tcl.smartlink.core
+com.tcl.messagebox
+android.autoinstalls.config.google.gtvpai
+com.tcl.waterfall.overseas
+com.tcl.exhibit
+com.tcl.esticker
+com.tcl.hotelmenu
+com.tcl.ocean.instructions
+com.tcl.repairguide
+com.google.android.apps.tv.dreamx
+com.google.android.play.games
+com.google.android.youtube.tvmusic
+com.google.android.syncadapters.calendar
+com.google.android.partnersetup
+com.tcl.airplay2
+com.mediatek.AirplayAPK
+com.mediatek.airplaydaemon
+com.tcl.miracast
+com.tcl.magiconnectfree
+com.tcl.ui_mediaCenter
+com.tcl.gallery
+br.com.claro.now.smarttvclient
+com.stremio.one
+com.sympxxr.ar
+com.google.android.videos
