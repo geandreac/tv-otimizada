@@ -4,8 +4,8 @@
 #   TV=IP:porta sh instalar-home.sh        (compile antes: cd launcher && ./gradlew assembleRelease)
 cd "$(dirname "$0")"
 . ./_log.sh
-ME=com.gathin.tvhome
-SVC=$ME/.HomeKeyService
+ME=com.gathin.inicio.tv   # id do app; o código Java segue em com.gathin.tvhome
+SVC=$ME/com.gathin.tvhome.HomeKeyService
 for apk in ../launcher/app/build/outputs/apk/release/app-release.apk ../launcher/dormir/build/outputs/apk/release/dormir-release.apk; do
   [ -f "$apk" ] || { echo "Falta $apk. Compile antes: cd launcher && ./gradlew assembleRelease" >&2; exit 1; }
   pkg=$(case "$apk" in *dormir*) echo com.gathin.dormir ;; *) echo $ME ;; esac)

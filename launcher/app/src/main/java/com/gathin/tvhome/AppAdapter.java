@@ -179,6 +179,9 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
                 if (fb < 0) return -1;
                 return Integer.compare(fa, fb);
             }
+            // Our own "Fire OS" shortcut is a testing aid: always the last tile.
+            boolean oa = a.pkg.equals(ctx.getPackageName()), ob = b.pkg.equals(ctx.getPackageName());
+            if (oa != ob) return oa ? 1 : -1;
             // Cards come right after the configured dock apps, before the alphabetical grid.
             boolean ca = a.kind == Entry.CARD, cb = b.kind == Entry.CARD;
             if (ca != cb) return ca ? -1 : 1;

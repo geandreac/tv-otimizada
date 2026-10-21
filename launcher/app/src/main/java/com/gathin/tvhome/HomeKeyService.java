@@ -45,10 +45,12 @@ public class HomeKeyService extends AccessibilityService {
 
     // Set by the "Home Fire OS" shortcut (AmazonHomeActivity): Amazon's home stays until this home is opened again.
     private static volatile boolean amazonMode;
+    private static volatile long amazonAskedAt;
 
     /** Testing: show Amazon's own home and stop bouncing off it until the user comes back to this home. */
     static void amazonRequested() {
         amazonMode = true;
+        amazonAskedAt = SystemClock.uptimeMillis();
     }
 
     /** Our Settings pill was pressed: on Fire OS that opens the Settings tab of Amazon's home. */
@@ -95,7 +97,8 @@ public class HomeKeyService extends AccessibilityService {
             // Only the home itself ends a visit: the invisible Fire OS shortcut belongs to this package too.
             if (cls != null && cls.toString().endsWith(".MainActivity")) {
                 settingsMode = false;
-                amazonMode = false;
+                // The home flashes back for a moment as the shortcut finishes, before Amazon's comes up: not a return.
+                if (SystemClock.uptimeMillis() - amazonAskedAt > 3000) amazonMode = false;
             }
             return;
         }

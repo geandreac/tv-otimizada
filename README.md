@@ -47,7 +47,7 @@ Os avisos de copyright originais estão em [`launcher/LICENSE-cleanyourtv`](laun
 - **Botão Home sem desligar a home original**: na TCL o serviço de acessibilidade captura a tecla Home. No Fire OS ele observa a home da Amazon e volta por um alarme do sistema. Tem ainda um modo Configurações que não briga com a aba de configurações da Amazon.
 - **Atalho "Fire OS"** (só no Fire TV, para testes): abre a home original da Amazon e pausa o bate-volta até você abrir a home nova de novo.
 - **Céu parado no Fire TV**: no Stick de 1 GB, o céu é desenhado uma vez e só redesenha na troca de cor.
-- **Logo nova** da home (banner e ícone) e **tradução pt-BR** completa da interface.
+- **Logo nova** da home (banner e ícone, gerados por `scripts/gerar-logo.ps1`) e **tradução pt-BR** completa da interface. O ícone tem fundo transparente porque a biblioteca de apps do Fire OS desenha todo app instalado por fora da loja como um quadrado sobre um bloco cinza.
 - **Correções**: ícone de bloco centralizado e sem corte, e dock que serve aos dois aparelhos.
 - **Scripts com log e desfazer** (`scripts/`) e as **listas de pacotes** dos dois aparelhos (`listas/`).
 - **Relatório de desempenho** Original × Otimizado.
@@ -104,6 +104,7 @@ sh scripts/desfazer-tudo.sh IP:porta
 - **Comente da lista o que você usa.** Desligar a Alexa no Fire TV faz o microfone do controle parar.
 - **TCL G08 (Google TV 14):** não desligue `com.google.android.tungsten.setupwraith` nem a home do Google (`launcherx`). O Wi-Fi caiu na hora, e sem o assistente a home entra em loop. Por isso a troca da home é feita pela acessibilidade.
 - **TCL:** o firmware zera a liberação de início automático a cada **reinício completo**. Desligar pelo controle não afeta.
+- **Fire OS e ícones:** a Amazon guarda o ícone de cada pacote para sempre, mesmo depois de desinstalar. Por isso o id do app passou a ser `com.gathin.inicio.tv`; o código Java continua em `com.gathin.tvhome`.
 - **Fire OS:** a home da Amazon não pode ser trocada nem desligada. Ao apertar Home ela aparece por 1 a 2 segundos antes da home nova voltar. Atualizações da Appstore podem religar apps; rode `desligar-apps.sh` de novo.
 - **DNS:** o AdGuard tira telemetria e anúncios de terceiros, mas não o banner de destaque da Amazon nem os anúncios dentro dos streamings.
 - **Dormir:** em TVs LCD/LED o preto ainda emite luz de fundo. Se a TV tiver "Desligar tela" ou "Somente áudio", use junto.
