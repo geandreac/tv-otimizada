@@ -43,6 +43,7 @@ Os avisos de copyright originais estão em [`launcher/LICENSE-cleanyourtv`](laun
 ### O que foi feito aqui
 
 - **App Dormir** (`launcher/dormir/`): tela escura com relógio flutuante que mantém a TV acordada enquanto o Spotify toca. O brilho se ajusta no controle (Cima/Baixo) para achar o nível mais escuro que a TV aceita sem achar que está "sem sinal".
+- **Dormir para Vega OS** (`vega/dormir/`): o mesmo app reescrito em React Native para os Fire TV Stick novos (HD 2026, 4K Select), que rodam Vega OS e não instalam APK. Tela preta, relógio pequeno e fraco andando devagar, 6 níveis de brilho no Cima/Baixo (fica salvo) e ícone de lua amarela.
 - **Bloco TV Aberta**: o app de TV da TCL vira o primeiro bloco e abre sempre na antena, mesmo vindo de um HDMI.
 - **Botão Home sem desligar a home original**: na TCL o serviço de acessibilidade captura a tecla Home. No Fire OS ele observa a home da Amazon e volta por um alarme do sistema. Tem ainda um modo Configurações que não briga com a aba de configurações da Amazon.
 - **Atalho "Fire OS"** (só no Fire TV, para testes): abre a home original da Amazon e pausa o bate-volta até você abrir a home nova de novo.
@@ -56,6 +57,7 @@ Os avisos de copyright originais estão em [`launcher/LICENSE-cleanyourtv`](laun
 
 ```
 launcher/            projeto Android (Gradle): app/ = home glass, dormir/ = app Dormir
+vega/dormir/         app Dormir para Fire TV com Vega OS (React Native, Vega SDK)
 scripts/             desligar-apps, ajustes, instalar-home, reativar-home (TCL)
 listas/              pacotes desligados em cada aparelho
 docs/                relatório e capturas
@@ -99,6 +101,30 @@ Cada script grava `alteracoes-log.txt` e gera `scripts/desfazer-tudo.sh`. Para v
 sh scripts/desfazer-tudo.sh IP:porta
 ```
 
+## Fire TV com Vega OS: só o Dormir
+
+Os Fire TV Stick novos (HD 2026, 4K Select) rodam **Vega OS**, não Fire OS. Para saber qual é o seu: em Configurações > Minha Fire TV > Sobre, Fire OS aparece como "Fire OS 7/8"; Vega aparece só como "OS 1.x/2.x". O Vega não instala APK nem tem `adb`, então a limpeza e a home glass não se aplicam. O Dormir foi reescrito para ele.
+
+Você precisa de: Ubuntu (ou macOS) com o [Vega SDK](https://developer.amazon.com/docs/vega/latest/install-vega-sdk.html), Node 20+ e uma conta [Amazon Developer](https://developer.amazon.com) (grátis). O SDK não roda no Windows; no Windows use o WSL2 com Ubuntu 22.04, como foi feito aqui.
+
+1. **Compilar**:
+   ```sh
+   cd vega/dormir && npm install && npm test && npm run build:release
+   ```
+2. **Ligar o Developer Mode** (uma vez): na TV, Configurações > Minha Fire TV > Sobre, aperte o botão central 7 vezes; depois Opções do desenvolvedor > Developer Mode mostra um código que vale 5 minutos.
+   ```sh
+   dbus-run-session -- bash scripts/ativar-devmode.sh     # no WSL; o script explica o porquê
+   ```
+   A TV reinicia. Em Opções do desenvolvedor, mude **Connection Mode** para **TCP/IP** (porta 5555).
+3. **Instalar e abrir**:
+   ```sh
+   vega exec vda connect IP:5555
+   vega device -d IP:5555 install-app --packagePath build/armv7-release/dormir_armv7.vpkg
+   vega device -d IP:5555 launch-app --appName com.gathin.dormir.main
+   ```
+
+O ícone (`assets/image/dormir_icon.png`, 512×512 como o Vega exige) é gerado por `python scripts/gerar-icone.py assets/image/dormir_icon.png`.
+
 ## Cuidados
 
 - **Comente da lista o que você usa.** Desligar a Alexa no Fire TV faz o microfone do controle parar.
@@ -108,6 +134,7 @@ sh scripts/desfazer-tudo.sh IP:porta
 - **Fire OS:** a home da Amazon não pode ser trocada nem desligada. Ao apertar Home ela aparece por 1 a 2 segundos antes da home nova voltar. Atualizações da Appstore podem religar apps; rode `desligar-apps.sh` de novo.
 - **DNS:** o AdGuard tira telemetria e anúncios de terceiros, mas não o banner de destaque da Amazon nem os anúncios dentro dos streamings.
 - **Dormir:** em TVs LCD/LED o preto ainda emite luz de fundo. Se a TV tiver "Desligar tela" ou "Somente áudio", use junto.
+- **Dormir no Vega OS:** o Vega não dá a um app comum como manter a tela acordada (no Android é `FLAG_KEEP_SCREEN_ON`). Ainda não foi testado se o protetor de tela entra por cima do Dormir com áudio tocando. Se entrar, o caminho é a API nativa `user_engagement` do SDK, que exige um módulo C++.
 
 ## Autoria e licença
 
