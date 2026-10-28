@@ -32,3 +32,16 @@ categories = ["com.amazon.category.main"]
 # Required for remote button events.
 [[wants.service]]
 id = "com.amazon.inputd.service"
+
+# W3C media player, for the silent black video that keeps the screensaver away.
+[[wants.service]]
+id = "com.amazon.mediametrics.service"
+
+[[wants.service]]
+id = "com.amazon.mediabuffer.service"
+
+[[wants.service]]
+id = "com.amazon.mediatransform.service"
+
+[[wants.service]]
+id = "com.amazon.media.server"

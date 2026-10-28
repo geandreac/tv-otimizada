@@ -3,6 +3,7 @@ import {useEffect, useRef, useState} from 'react';
 import {StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 import {useTVEventHandler} from '@amazon-devices/react-native-kepler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Video} from '@amazon-devices/react-native-w3cmedia';
 import {DEFAULT_LEVEL, LEVELS, clampLevel, formatTime, grey, step} from './drift';
 
 // Black screen with a small dim clock drifting slowly, for sleeping with audio on.
@@ -10,6 +11,9 @@ import {DEFAULT_LEVEL, LEVELS, clampLevel, formatTime, grey, step} from './drift
 const FRAME_MS = 1000; // once a second: the clock ticks and moves, near-zero CPU
 const HINT_MS = 8000; // how long the help line shows after opening or a change
 const KEY = 'nivel';
+// Vega only holds off the screensaver for an app that is playing video, and gives other apps no API for it
+// (user_engagement needs an Amazon-only permission). So a silent, all-black one-hour video plays under the clock.
+const KEEP_AWAKE = 'file:///pkg/assets/raw/black.mp4';
 
 export const App = () => {
   const {width, height} = useWindowDimensions();
@@ -19,6 +23,7 @@ export const App = () => {
   const [pos, setPos] = useState({x: width * 0.4, y: height * 0.45});
   const vel = useRef({x: 3, y: 2});
   const size = useRef({w: 0, h: 0});
+  const video = useRef<Video>(null);
 
   useEffect(() => {
     AsyncStorage.getItem(KEY)
@@ -53,6 +58,19 @@ export const App = () => {
 
   return (
     <View style={styles.root}>
+      <Video
+        style={StyleSheet.absoluteFill}
+        src={KEEP_AWAKE}
+        autoplay
+        ref={video}
+        onEnded={() => {
+          // loop is not supported by the Vega player, so restart by hand
+          if (video.current) {
+            video.current.currentTime = 0;
+            video.current.play();
+          }
+        }}
+      />
       <Text
         style={[styles.clock, {color: grey(level), left: pos.x, top: pos.y}]}
         onLayout={e => {
