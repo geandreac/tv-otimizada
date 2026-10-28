@@ -123,7 +123,10 @@ Você precisa de: Ubuntu (ou macOS) com o [Vega SDK](https://developer.amazon.co
    vega device -d IP:5555 launch-app --appName com.gathin.dormir.main
    ```
 
-O ícone (`assets/image/dormir_icon.png`, 512×512 como o Vega exige) é gerado por `python scripts/gerar-icone.py assets/image/dormir_icon.png`.
+O ícone (`assets/image/dormir_icon.png`, 512×512 como o Vega exige) é gerado por `python scripts/gerar-icone.py assets/image/dormir_icon.png`. O vídeo preto que segura o protetor de tela, por:
+```sh
+ffmpeg -f lavfi -i color=c=black:s=640x360:r=1 -t 3600 -c:v libx264 -profile:v baseline -pix_fmt yuv420p -tune stillimage -g 600 -an -movflags +faststart assets/raw/black.mp4
+```
 
 ## Cuidados
 
@@ -134,7 +137,7 @@ O ícone (`assets/image/dormir_icon.png`, 512×512 como o Vega exige) é gerado 
 - **Fire OS:** a home da Amazon não pode ser trocada nem desligada. Ao apertar Home ela aparece por 1 a 2 segundos antes da home nova voltar. Atualizações da Appstore podem religar apps; rode `desligar-apps.sh` de novo.
 - **DNS:** o AdGuard tira telemetria e anúncios de terceiros, mas não o banner de destaque da Amazon nem os anúncios dentro dos streamings.
 - **Dormir:** em TVs LCD/LED o preto ainda emite luz de fundo. Se a TV tiver "Desligar tela" ou "Somente áudio", use junto.
-- **Dormir no Vega OS:** o Vega não dá a um app comum como manter a tela acordada (no Android é `FLAG_KEEP_SCREEN_ON`). Ainda não foi testado se o protetor de tela entra por cima do Dormir com áudio tocando. Se entrar, o caminho é a API nativa `user_engagement` do SDK, que exige um módulo C++.
+- **Dormir no Vega OS:** o Vega não dá a um app comum como manter a tela acordada (no Android é `FLAG_KEEP_SCREEN_ON`), e sem isso o protetor de tela entra em 5 minutos. A API nativa `user_engagement` existe, mas o sistema recusa o pedido de apps sem uma permissão da Amazon ("No permission to request 18"). O que funciona: o Dormir toca por baixo do relógio um vídeo preto e mudo de 1 hora (`assets/raw/black.mp4`, 63 KB), e com vídeo tocando a TV mantém a tela ligada. O vídeo não acrescenta luz nenhuma.
 
 ## Autoria e licença
 
