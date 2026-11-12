@@ -144,3 +144,11 @@ ffmpeg -f lavfi -i color=c=black:s=640x360:r=1 -t 3600 -c:v libx264 -profile:v b
 Criado por **Geandre Colares** ([@geandreac](https://github.com/geandreac)) com o **Claude** (Anthropic) como par de programação, em outubro de 2026. O código escrito aqui está sob a licença MIT ([`LICENSE`](LICENSE)). As partes dos três projetos acima continuam sob a licença MIT de seus autores, com os avisos preservados.
 
 Isto foi o que funcionou em dois aparelhos reais e não é garantia para o seu. Use por sua conta e mantenha o `desfazer-tudo.sh` por perto.
+
+## Como clonar
+
+```bash
+git clone https://github.com/geandreac/tv-otimizada.git
+cd tv-otimizada
+# os scripts são aplicados no aparelho via adb — siga a documentação em docs/ e a pasta scripts/
+```
